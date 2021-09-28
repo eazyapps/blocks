@@ -6,15 +6,15 @@ import {VerboseMessage, Messages, MessageInfo} from './verbose_message';
 import {createSystem, System} from './system';
 
 export interface ConfigSystem {
-    createSystem(): System;
+	createSystem(): System;
 }
 
 export interface ConfigMessages {
-    createMessages(): Messages;
+	createMessages(): Messages;
 }
 
 export interface ConfigChalk {
-    createChalk(): chalk.Chalk;
+	createChalk(): chalk.Chalk;
 }
 
 /**
@@ -23,73 +23,74 @@ export interface ConfigChalk {
  * for operations with the Host.
  */
 export default abstract class AirtableCommand extends Command {
-    system!: System;
-    messages!: Messages;
-    chalk = chalk as chalk.Chalk;
+	system!: System;
+	messages!: Messages;
+	chalk = chalk as chalk.Chalk;
 
-    errorMessage<Message extends MessageInfo>(
-        message: Message,
-        options?: Parameters<Command['error']>[1],
-    ) {
-        return this.error(this.messages.renderMessage(message), options);
-    }
+	errorMessage<Message extends MessageInfo>(
+		message: Message,
+		options?: Parameters<Command['error']>[1],
+	) {
+		return this.error(this.messages.renderMessage(message), options);
+	}
 
-    logMessage<Message extends MessageInfo>(message: Message) {
-        return this.log(this.messages.renderMessage(message));
-    }
+	logMessage<Message extends MessageInfo>(message: Message) {
+		return this.log(this.messages.renderMessage(message));
+	}
 
-    warnMessage<Message extends MessageInfo>(message: Message) {
-        return this.warn(this.messages.renderMessage(message));
-    }
+	warnMessage<Message extends MessageInfo>(message: Message) {
+		return this.warn(this.messages.renderMessage(message));
+	}
 
-    /* eslint-disable airtable/no-missing-async-suffix */
-    async init() {
-        await this.initAsync();
-    }
+	/* eslint-disable airtable/no-missing-async-suffix */
+	async init() {
+		await this.initAsync();
+	}
 
-    async run() {
-        await this.runAsync();
-    }
+	async run() {
+		await this.runAsync();
+	}
 
-    async catch(err: Error) {
-        return await this.catchAsync(err);
-    }
+	async catch(err: Error) {
+		return await this.catchAsync(err);
+	}
 
-    async finally(err: Error | undefined) {
-        if (this.finallyAsync) {
-            await this.finallyAsync(err);
-        }
-    }
-    /* eslint-enable airtable/no-missing-async-suffix */
+	async finally(err: Error | undefined) {
+		if (this.finallyAsync) {
+			await this.finallyAsync(err);
+		}
+	}
+	/* eslint-enable airtable/no-missing-async-suffix */
 
-    async initAsync() {
-        if (this.config && 'createSystem' in this.config) {
-            this.system = (this.config as ConfigSystem).createSystem();
-        } else {
-            this.system = createSystem();
-        }
+	async initAsync() {
+		if (this.config && 'createSystem' in this.config) {
+			this.system = (this.config as ConfigSystem).createSystem();
+		} else {
+			this.system = createSystem();
+		}
 
-        if (this.config && 'createChalk' in this.config) {
-            this.chalk = (this.config as ConfigChalk).createChalk();
-        }
+		if (this.config && 'createChalk' in this.config) {
+			this.chalk = (this.config as ConfigChalk).createChalk();
+		}
 
-        if (this.config && 'createMessages' in this.config) {
-            this.messages = (this.config as ConfigMessages).createMessages();
-        } else {
-            this.messages = new VerboseMessage({chalk: this.chalk});
-        }
-    }
+		if (this.config && 'createMessages' in this.config) {
+			this.messages = (this.config as ConfigMessages).createMessages();
+		} else {
+			this.messages = new VerboseMessage({chalk: this.chalk});
+		}
+	}
 
-    abstract runAsync(): Promise<void>;
+	abstract runAsync(): Promise<void>;
 
-    async catchAsync(err: Error): Promise<void> {
-        if (this.messages.supportsError(err)) {
-            err.message = this.messages.renderError(err);
-            err.stack = err.message;
-            this.error(err, {message: err.message, code: err.__userInfo.type, exit: 1});
-        }
-        throw err;
-    }
+	async catchAsync(err: Error): Promise<void> {
+		console.log(err);
+		if (this.messages.supportsError(err)) {
+			err.message = this.messages.renderError(err);
+			err.stack = err.message;
+			this.error(err, {message: err.message, code: err.__userInfo.type, exit: 1});
+		}
+		throw err;
+	}
 
-    async finallyAsync?(err: Error | undefined): Promise<void>;
+	async finallyAsync?(err: Error | undefined): Promise<void>;
 }
