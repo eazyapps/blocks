@@ -18,11 +18,65 @@ const missingAirtableInterfaceErrorMessage = [
     '`@airtable/blocks` module.',
 ].join('');
 
-/** @hidden */
+const defaultInterface = (_arg: number): AirtableInterface => {
+    return {
+        sdkInitData: {
+            initialKvValuesByKey: {},
+            isDevelopmentMode: true,
+            baseData: {
+                id: '',
+                name: '',
+                tableOrder: [],
+                activeTableId: null,
+                tablesById: {},
+                appInterface: {},
+                collaboratorsById: {
+                    a: {
+                        id: 'a',
+                        name: 'Jess Patel',
+                    },
+                    b: {
+                        id: 'b',
+                        name: 'Casey Park',
+                    },
+                    d: {
+                        id: 'd',
+                        name: 'Sandy Hagen',
+                    },
+                    e: {
+                        id: 'e',
+                        name: 'Logan Grandmont',
+                    },
+                },
+                activeCollaboratorIds: ['a', 'b', 'd', 'e'],
+                currentUserId: null,
+                permissionLevel: '',
+                enabledFeatureNames: [],
+                cursorData: null,
+            },
+            blockInstallationId: '',
+            isFullscreen: false,
+            isFirstRun: false,
+        },
+        subscribeToModelUpdates: () => {},
+        subscribeToGlobalConfigUpdates: () => {},
+        subscribeToSettingsButtonClick: () => {},
+        subscribeToEnterFullScreen: () => {},
+        subscribeToExitFullScreen: () => {},
+        subscribeToFocus: () => {},
+        assertAllowedSdkPackageVersion: () => {},
+        aggregators: {
+            getAllAvailableAggregatorKeys: () => {
+                return [];
+            },
+        },
+    };
+}; /** @hidden */
 export default function getAirtableInterface(): AirtableInterface {
-    const getAirtableInterfaceAtVersion:
-        | ((arg1: number) => AirtableInterface)
-        | void = (window as any).__getAirtableInterfaceAtVersion;
+    const w = typeof window === 'undefined' ? {} : window;
+    const aInterface: any = (((w as any).__getAirtableInterfaceAtVersion ||
+        defaultInterface) as unknown) as AirtableInterface;
+    const getAirtableInterfaceAtVersion: ((arg1: number) => AirtableInterface) | void = aInterface;
 
     if (!airtableInterface) {
         if (!getAirtableInterfaceAtVersion) {
