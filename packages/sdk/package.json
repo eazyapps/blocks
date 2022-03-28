@@ -45,7 +45,7 @@
         "watch:types": "yarn run build:types --watch",
         "build:docs": "cd ../blocks-docs && yarn run build && cd ../sdk",
         "build": "yarn run build:clean && concurrently yarn:build:babel yarn:build:types",
-        "build:ea": "yarn run build:clean && concurrently yarn:build:babel",
+        "build:easyapps": "yarn run build:clean && concurrently yarn:build:babel",
         "watch": "yarn run build:clean && concurrently yarn:watch:babel yarn:watch:types",
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook",
