@@ -88,7 +88,7 @@ export function createWebpackCompilerConfig({
         devtool = 'inline-cheap-module-source-map';
     }
     if (shouldGenerateSeparateSourceMaps) {
-        devtool = 'source-map';
+        devtool = 'inline-source-map';
     }
 
     return {

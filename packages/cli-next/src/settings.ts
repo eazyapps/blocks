@@ -33,10 +33,10 @@ export const GLOBAL_REACT_DOM_SERVER_VARIABLE_NAME = '_airtableReactDOMServer';
 export const GLOBAL_RUN_BLOCK_FUNCTION_NAME = '_airtableRunBlock';
 export const GLOBAL_BLOCK_CODE_VERSION_VARIABLE_NAME = '_airtableBlockCodeVersion';
 
-export const BLOCK_REQUEST_BODY_LIMIT = 5.2 * 1024 * 1024; 
+export const BLOCK_REQUEST_BODY_LIMIT = 5.2 * 1024 * 1024;
 
 /** The name of the blocks sdk. */
 export const SDK_PACKAGE_NAME = '@airtable/blocks';
 
 /** This access token is not considered sensitive. */
-export const ROLLBAR_ACCESS_TOKEN = '2de7b9533b7243f7989e3a7584c7dad7';
+export const ROLLBAR_ACCESS_TOKEN = '870557cc78f64f4a8ce452597154d7ad';
