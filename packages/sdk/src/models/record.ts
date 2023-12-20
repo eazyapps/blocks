@@ -346,7 +346,7 @@ class Record extends AbstractModel<RecordData, WatchableRecordKey> {
      * @example
      * ```js
      * console.log(myRecord.url);
-     * // => 'https://airtable.com/tblxxxxxxxxxxxxxx/recxxxxxxxxxxxxxx'
+     * // => 'https://airtable.com/appxxxxxxxxxxxxxx/tblxxxxxxxxxxxxxx/recxxxxxxxxxxxxxx'
      * ```
      */
     get url(): string {
@@ -402,7 +402,6 @@ class Record extends AbstractModel<RecordData, WatchableRecordKey> {
         const {cellValuesByFieldId, commentCount} = dirtyPaths;
 
         if (cellValuesByFieldId && !isObjectEmpty(cellValuesByFieldId)) {
-
             this._onChange(WatchableRecordKeys.cellValues, Object.keys(cellValuesByFieldId));
 
             if (cellValuesByFieldId[this.parentTable.primaryField.id]) {

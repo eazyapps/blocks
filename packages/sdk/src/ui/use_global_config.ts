@@ -4,7 +4,7 @@ import useWatchable from './use_watchable';
 import {useSdk} from './sdk_context';
 
 /**
- * Returns the app's {@link GlobalConfig} and updates whenever any key in {@link GlobalConfig}
+ * Returns the extension's {@link GlobalConfig} and updates whenever any key in {@link GlobalConfig}
  * changes.
  *
  * @example
@@ -23,7 +23,7 @@ import {useSdk} from './sdk_context';
  *         <React.Fragment>
  *             <Button icon="minus" onClick={decrement} disabled={!isEnabled} ariaLabel="decrease"/>
  *             {count}
- *             <Button icon="plus" onClick={increment} disabled={!isEnabled} airaLabel="increase"/>
+ *             <Button icon="plus" onClick={increment} disabled={!isEnabled} ariaLabel="increase"/>
  *         </React.Fragment>
  *     );
  * }

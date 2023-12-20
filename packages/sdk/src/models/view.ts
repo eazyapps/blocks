@@ -18,6 +18,7 @@ import * as RecordColoring from './record_coloring';
 
 const WatchableViewKeys = Object.freeze({
     name: 'name' as const,
+    isLockedView: 'isLockedView' as const,
 });
 
 /**
@@ -105,12 +106,24 @@ class View extends AbstractModel<ViewData, WatchableViewKey> {
         return this._data.type;
     }
     /**
+     * If the view is locked. Can be watched.
+     *
+     * @example
+     * ```js
+     * console.log(myView.isLockedView);
+     * // => false
+     * ```
+     */
+    get isLockedView(): boolean {
+        return this._data.isLockedView;
+    }
+    /**
      * The URL for the view. You can visit this URL in the browser to be taken to the view in the Airtable UI.
      *
      * @example
      * ```js
      * console.log(myView.url);
-     * // => 'https://airtable.com/tblxxxxxxxxxxxxxx/viwxxxxxxxxxxxxxx'
+     * // => 'https://airtable.com/appxxxxxxxxxxxxxx/tblxxxxxxxxxxxxxx/viwxxxxxxxxxxxxxx'
      * ```
      */
     get url(): string {
@@ -322,6 +335,10 @@ class View extends AbstractModel<ViewData, WatchableViewKey> {
         this._viewDataStore.triggerOnChangeForDirtyPaths(dirtyPaths);
         if (dirtyPaths.name) {
             this._onChange(WatchableViewKeys.name);
+            didViewSchemaChange = true;
+        }
+        if (dirtyPaths.isLocked) {
+            this._onChange(WatchableViewKeys.isLockedView);
             didViewSchemaChange = true;
         }
         return didViewSchemaChange;

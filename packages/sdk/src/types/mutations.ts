@@ -16,6 +16,7 @@ export const MutationTypes = Object.freeze({
     CREATE_SINGLE_FIELD: 'createSingleField' as const,
     UPDATE_SINGLE_FIELD_CONFIG: 'updateSingleFieldConfig' as const,
     UPDATE_SINGLE_FIELD_DESCRIPTION: 'updateSingleFieldDescription' as const,
+    UPDATE_SINGLE_FIELD_NAME: 'updateSingleFieldName' as const,
     CREATE_SINGLE_TABLE: 'createSingleTable' as const,
     UPDATE_VIEW_METADATA: 'updateViewMetadata' as const,
 });
@@ -38,6 +39,8 @@ export interface SetMultipleRecordsCellValuesMutation {
         readonly id: RecordId;
         readonly cellValuesByFieldId: ObjectMap<FieldId, unknown>;
     }>;
+    /** @hidden */
+    readonly opts?: {parseDateCellValueInColumnTimeZone?: boolean};
 }
 
 /** @hidden */
@@ -50,6 +53,7 @@ export interface PartialSetMultipleRecordsCellValuesMutation {
               readonly cellValuesByFieldId: ObjectMap<FieldId, unknown | undefined> | undefined;
           }>
         | undefined;
+    readonly opts?: {parseDateCellValueInColumnTimeZone?: boolean};
 }
 
 /**
@@ -88,6 +92,8 @@ export interface CreateMultipleRecordsMutation {
         readonly id: RecordId;
         readonly cellValuesByFieldId: ObjectMap<FieldId, unknown>;
     }>;
+    /** @hidden */
+    readonly opts?: {parseDateCellValueInColumnTimeZone?: boolean};
 }
 
 /** @hidden */
@@ -100,6 +106,7 @@ export interface PartialCreateMultipleRecordsMutation {
               readonly cellValuesByFieldId: ObjectMap<FieldId, unknown | undefined> | undefined;
           }>
         | undefined;
+    readonly opts?: {parseDateCellValueInColumnTimeZone?: boolean};
 }
 
 /**
@@ -209,6 +216,30 @@ export interface PartialUpdateSingleFieldDescriptionMutation {
 }
 
 /**
+ * The Mutation emitted when the App modifies the name of a {@link Field}.
+ *
+ * @docsPath testing/mutations/UpdateSingleFieldNameMutation
+ */
+export interface UpdateSingleFieldNameMutation {
+    /** This Mutation's [discriminant property](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) */
+    readonly type: typeof MutationTypes.UPDATE_SINGLE_FIELD_NAME;
+    /** The identifier for the Table in which a Field is being modified */
+    readonly tableId: TableId;
+    /** The identifier for the Field being modified */
+    readonly id: FieldId;
+    /** The new name for the Field being updated */
+    readonly name: string;
+}
+
+/** @hidden */
+export interface PartialUpdateSingleFieldNameMutation {
+    readonly type: typeof MutationTypes.UPDATE_SINGLE_FIELD_NAME;
+    readonly tableId: TableId | undefined;
+    readonly id: FieldId | undefined;
+    readonly name: string | undefined;
+}
+
+/**
  * Options that affect the behavior of an `UpdateSingleFieldConfigMutation`
  */
 export interface UpdateFieldOptionsOpts {
@@ -288,6 +319,7 @@ export type Mutation =
     | CreateSingleFieldMutation
     | UpdateSingleFieldConfigMutation
     | UpdateSingleFieldDescriptionMutation
+    | UpdateSingleFieldNameMutation
     | CreateSingleTableMutation
     | UpdateViewMetadataMutation;
 
@@ -300,6 +332,7 @@ export type PartialMutation =
     | PartialCreateSingleFieldMutation
     | PartialUpdateSingleFieldConfigMutation
     | PartialUpdateSingleFieldDescriptionMutation
+    | PartialUpdateSingleFieldNameMutation
     | PartialCreateSingleTableMutation
     | PartialUpdateViewMetadataMutation;
 

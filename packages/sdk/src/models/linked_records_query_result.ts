@@ -251,10 +251,7 @@ class LinkedRecordsQueryResult extends RecordQueryResult<LinkedRecordsQueryResul
             this._record.__linkedRecordsQueryResultPool.unregisterObjectForReuseStrong(this);
             this._unwatchOrigin();
             this._unwatchLinkedQueryResult();
-
-            this._sdk.base
-                .__getRecordStore(this._record.parentTable.id)
-                .unloadCellValuesInFieldIds([this._field.id]);
+            this._originRecordStore.unloadCellValuesInFieldIds([this._field.id]);
             this._linkedQueryResult.unloadData();
             this._unloadRecordColors();
 
@@ -392,10 +389,11 @@ class LinkedRecordsQueryResult extends RecordQueryResult<LinkedRecordsQueryResul
 
     /** @internal */
     _onLinkedRecordIdsChange() {
-        invariant(this.isValid, 'watch key change event whilst invalid');
-        if (!this.isDataLoaded) {
+        if (!this.isDataLoaded || this._record.isDeleted) {
             return;
         }
+
+        invariant(this.isValid, 'watch key change event whilst invalid');
 
         this._invalidateComputedData();
 
@@ -476,11 +474,12 @@ class LinkedRecordsQueryResult extends RecordQueryResult<LinkedRecordsQueryResul
 
     /** @internal */
     _onOriginCellValueChange() {
-        invariant(this.isValid, 'watch key change event whilst invalid');
-
-        if (!this.isDataLoaded) {
+        if (!this.isDataLoaded || this._field.isDeleted) {
             return;
         }
+
+        invariant(this.isValid, 'watch key change event whilst invalid');
+
         this._invalidateComputedData();
 
         this._onChange('records');

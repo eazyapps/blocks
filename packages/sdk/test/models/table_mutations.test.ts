@@ -72,6 +72,9 @@ describe('Table', () => {
                             },
                         },
                     ],
+                    opts: {
+                        parseDateCellValueInColumnTimeZone: true,
+                    },
                 },
                 {holdForMs: 100},
             );
@@ -105,6 +108,9 @@ describe('Table', () => {
                             },
                         },
                     ],
+                    opts: {
+                        parseDateCellValueInColumnTimeZone: true,
+                    },
                 },
                 {holdForMs: 100},
             );
@@ -120,7 +126,7 @@ describe('Table', () => {
                     {
                         'Field 1': 5,
                         'Field 2': 6,
-                    } as any, 
+                    } as any,
                 ]),
             ).rejects.toThrowError(
                 'Invalid record format. Please define field mappings using a `fields` key for each record definition object',
@@ -136,7 +142,7 @@ describe('Table', () => {
                     {
                         fldTest1: 7,
                         fldTest2: 8,
-                    } as any, 
+                    } as any,
                 ]),
             ).rejects.toThrowError(
                 'Invalid record format. Please define field mappings using a `fields` key for each record definition object',

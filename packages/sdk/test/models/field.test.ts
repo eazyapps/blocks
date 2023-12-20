@@ -19,6 +19,10 @@ describe('Field', () => {
     let field: Field;
 
     const makeField = (fieldType: FieldType) => {
+        return makeFieldWithIsSynced(fieldType, null);
+    };
+
+    const makeFieldWithIsSynced = (fieldType: FieldType, isSynced: boolean | null) => {
         const fieldId = 'fldTest';
         const baseData = mockAirtableInterface.sdkInitData.baseData;
         const parentTable = baseData.tablesById.tblDesignProjects;
@@ -29,6 +33,7 @@ describe('Field', () => {
             typeOptions: null,
             description: null,
             lock: null,
+            isSynced: isSynced,
         };
 
         const newField = new Field(sdk, sdk.base.getTableById('tblDesignProjects'), fieldId);
@@ -215,6 +220,82 @@ describe('Field', () => {
         });
     });
 
+    describe('updateNameAsync', () => {
+        it('accepts non-null name', async () => {
+            const fieldName = 'my awesome name';
+            await field.updateNameAsync(fieldName);
+
+            expect(mockAirtableInterface.applyMutationAsync).toHaveBeenCalledTimes(1);
+            expect(mockAirtableInterface.applyMutationAsync).toHaveBeenLastCalledWith(
+                {
+                    tableId: 'tblDesignProjects',
+                    id: 'fldPrjctClient',
+                    name: fieldName,
+                    type: 'updateSingleFieldName',
+                },
+                {holdForMs: 100},
+            );
+        });
+    });
+
+    describe('#checkPermissionsForUpdateName', () => {
+        test('request to AirtableInterface - without name', () => {
+            field.checkPermissionsForUpdateName();
+
+            expect(mockAirtableInterface.checkPermissionsForMutation).toHaveBeenCalledTimes(1);
+            expect(mockAirtableInterface.checkPermissionsForMutation).toHaveBeenCalledWith(
+                {
+                    name: undefined,
+                    id: 'fldPrjctClient',
+                    tableId: 'tblDesignProjects',
+                    type: 'updateSingleFieldName',
+                },
+                mockAirtableInterface.sdkInitData.baseData,
+            );
+        });
+
+        test('request to AirtableInterface - with name', () => {
+            const fieldName = 'a cool name';
+            field.checkPermissionsForUpdateName(fieldName);
+            expect(mockAirtableInterface.checkPermissionsForMutation).toHaveBeenCalledTimes(1);
+            expect(mockAirtableInterface.checkPermissionsForMutation).toHaveBeenCalledWith(
+                {
+                    name: fieldName,
+                    id: 'fldPrjctClient',
+                    tableId: 'tblDesignProjects',
+                    type: 'updateSingleFieldName',
+                },
+                mockAirtableInterface.sdkInitData.baseData,
+            );
+        });
+
+        test('forwarding of response from AirtableInterface', () => {
+            mockAirtableInterface.checkPermissionsForMutation.mockReturnValue({
+                hasPermission: true,
+            });
+            expect(field.checkPermissionsForUpdateName()).toStrictEqual({
+                hasPermission: true,
+            });
+        });
+    });
+
+    describe('#hasPermissionToUpdateName', () => {
+        test('return value: true', () => {
+            mockAirtableInterface.checkPermissionsForMutation.mockReturnValue({
+                hasPermission: true,
+            });
+            expect(field.hasPermissionToUpdateName()).toBe(true);
+        });
+
+        test('return value: false', () => {
+            mockAirtableInterface.checkPermissionsForMutation.mockReturnValue({
+                hasPermission: false,
+                reasonDisplayString: '',
+            });
+            expect(field.hasPermissionToUpdateName()).toBe(false);
+        });
+    });
+
     describe('#convertStringToCellValue', () => {
         test('request to AirtableInterface: conversion', () => {
             field.convertStringToCellValue('hello');
@@ -224,7 +305,9 @@ describe('Field', () => {
             ).toHaveBeenCalledTimes(1);
             expect(
                 mockAirtableInterface.fieldTypeProvider.convertStringToCellValue,
-            ).toHaveBeenCalledWith(sdk.__appInterface, 'hello', field._data);
+            ).toHaveBeenCalledWith(sdk.__appInterface, 'hello', field._data, {
+                parseDateCellValueInColumnTimeZone: false,
+            });
         });
 
         test('computed value (no validation applied)', () => {
@@ -283,6 +366,23 @@ describe('Field', () => {
 
     test('#description', () => {
         expect(field.description).toBe('the project client');
+    });
+
+    describe('#isFieldSynced', () => {
+        test('null', () => {
+            const newField = makeFieldWithIsSynced(FieldType.SINGLE_SELECT, null);
+            expect(newField.isFieldSynced).toBe(false);
+        });
+
+        test('affirmative', () => {
+            const newField = makeFieldWithIsSynced(FieldType.SINGLE_SELECT, true);
+            expect(newField.isFieldSynced).toBe(true);
+        });
+
+        test('negative', () => {
+            const newField = makeFieldWithIsSynced(FieldType.SINGLE_SELECT, false);
+            expect(newField.isFieldSynced).toBe(false);
+        });
     });
 
     describe('#isComputed', () => {
@@ -399,12 +499,14 @@ describe('Field', () => {
                 name: jest.fn(),
                 options: jest.fn(),
                 type: jest.fn(),
+                isFieldSynced: jest.fn(),
             };
             field.watch('description', mocks.description);
             field.watch('isComputed', mocks.isComputed);
             field.watch('name', mocks.name);
             field.watch('options', mocks.options);
             field.watch('type', mocks.type);
+            field.watch('isFieldSynced', mocks.isFieldSynced);
         });
 
         test('key: description', () => {
@@ -426,6 +528,7 @@ describe('Field', () => {
             expect(mocks.name).toHaveBeenCalledTimes(0);
             expect(mocks.options).toHaveBeenCalledTimes(0);
             expect(mocks.type).toHaveBeenCalledTimes(0);
+            expect(mocks.isFieldSynced).toHaveBeenCalledTimes(0);
         });
 
         test('key: isComputed', () => {
@@ -447,6 +550,7 @@ describe('Field', () => {
             expect(mocks.name).toHaveBeenCalledTimes(0);
             expect(mocks.options).toHaveBeenCalledTimes(0);
             expect(mocks.type).toHaveBeenCalledTimes(1);
+            expect(mocks.isFieldSynced).toHaveBeenCalledTimes(0);
         });
 
         test('key: name', () => {
@@ -468,6 +572,7 @@ describe('Field', () => {
             expect(mocks.name).toHaveBeenCalledTimes(1);
             expect(mocks.options).toHaveBeenCalledTimes(0);
             expect(mocks.type).toHaveBeenCalledTimes(0);
+            expect(mocks.isFieldSynced).toHaveBeenCalledTimes(0);
         });
 
         test('key: options', () => {
@@ -489,6 +594,7 @@ describe('Field', () => {
             expect(mocks.name).toHaveBeenCalledTimes(0);
             expect(mocks.options).toHaveBeenCalledTimes(1);
             expect(mocks.type).toHaveBeenCalledTimes(0);
+            expect(mocks.isFieldSynced).toHaveBeenCalledTimes(0);
         });
 
         test('key: type', () => {
@@ -510,6 +616,29 @@ describe('Field', () => {
             expect(mocks.name).toHaveBeenCalledTimes(0);
             expect(mocks.options).toHaveBeenCalledTimes(0);
             expect(mocks.type).toHaveBeenCalledTimes(1);
+            expect(mocks.isFieldSynced).toHaveBeenCalledTimes(0);
+        });
+
+        test('key: isFieldSynced', () => {
+            mockAirtableInterface.triggerModelUpdates([
+                {
+                    path: [
+                        'tablesById',
+                        'tblDesignProjects',
+                        'fieldsById',
+                        'fldPrjctClient',
+                        'isSynced',
+                    ],
+                    value: 'true',
+                },
+            ]);
+
+            expect(mocks.description).toHaveBeenCalledTimes(0);
+            expect(mocks.isComputed).toHaveBeenCalledTimes(0);
+            expect(mocks.name).toHaveBeenCalledTimes(0);
+            expect(mocks.options).toHaveBeenCalledTimes(0);
+            expect(mocks.type).toHaveBeenCalledTimes(0);
+            expect(mocks.isFieldSynced).toHaveBeenCalledTimes(1);
         });
     });
 });

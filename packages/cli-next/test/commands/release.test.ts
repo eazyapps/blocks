@@ -22,7 +22,6 @@ import {AppConfigErrorName} from '../../src/helpers/config_app';
 import {RemoteConfigErrorName} from '../../src/helpers/config_remote';
 import {SystemApiKeyErrorName} from '../../src/helpers/system_api_key';
 import {AppBundlerContext} from '../../src/manager/bundler';
-import {BuildErrorName} from '../../src/helpers/build_messages';
 import {
     ReleaseCommandErrorName,
     ReleaseCommandMessageName,
@@ -187,67 +186,19 @@ describe('release', () => {
             airtableLegacyBlockApiStub({
                 async createBuildAsync(): Promise<CreateBuildResponseJson> {
                     throw spawnUserError<AirtableApiErrorInfo>({
-                        type: AirtableApiErrorName.AIRTABLE_API_BASE_NOT_FOUND,
+                        type: AirtableApiErrorName.AIRTABLE_API_BLOCK_NOT_FOUND,
                     });
                 },
             }),
         )
         .command(['release'])
-        .catch(new RegExp(AirtableApiErrorName.AIRTABLE_API_BASE_NOT_FOUND))
+        .catch(new RegExp(AirtableApiErrorName.AIRTABLE_API_BLOCK_NOT_FOUND))
         .it('throws base not found error');
-
-    testReleaseCommand
-        .withFiles({
-            '/home/projects/my-app/node_modules': null,
-        })
-        .command(['release'])
-        .catch(new RegExp(BuildErrorName.BUILD_NODE_MODULES_ABSENT))
-        .it('fails in the absence of a directory named "node_modules"');
 
     testReleaseCommand
         .command(['release', '--comment', 'fixed the bug'])
         .catch(new RegExp(ReleaseCommandErrorName.RELEASE_COMMAND_BLOCK1_COMMENT_UNSUPPORTED))
         .it('does not support comment flag for v1 blocks');
-
-    testReleaseCommand
-        .stub(getGitHashModule, 'getGitHashAsync', () => null)
-        .command(['release', '--upload-source-maps-to-rollbar'])
-        .catch(
-            'failed to get gitHash, the block must be in a git repo to support uploading sourcemaps',
-        )
-        .it('requires gitHash');
-
-    testReleaseCommand
-        .command(['release', '--upload-source-maps-to-rollbar'])
-        .catch('bundleCdn must be set on the .block/*.json config')
-        .it('requires bundleCdn to be set');
-
-    testReleaseCommand
-        .withJSON({
-            '/home/projects/my-app/.block/remote.json': {
-                baseId: 'abcd',
-                blockId: '1234',
-                bundleCdn: 'https://cdn.airtableblocks.com',
-            },
-        })
-        .nock('https://api.rollbar.com', api => api.post('/api/1/sourcemap').reply(200, {}))
-        .command(['release', '--upload-source-maps-to-rollbar'])
-        .it('uploads sourcemaps when flag is set');
-
-    testReleaseCommand
-        .withJSON({
-            '/home/projects/my-app/.block/remote.json': {
-                baseId: 'abcd',
-                blockId: '1234',
-                bundleCdn: 'https://cdn.airtableblocks.com',
-            },
-        })
-        .nock('https://api.rollbar.com', api =>
-            api.post('/api/1/sourcemap').reply(404, {body: 'An error was encountered'}),
-        )
-        .command(['release', '--upload-source-maps-to-rollbar'])
-        .catch(new RegExp('An error was encountered'))
-        .it('reports api errors when failing to upload source maps');
 });
 
 function createStubs() {

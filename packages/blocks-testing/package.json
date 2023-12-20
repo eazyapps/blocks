@@ -1,10 +1,10 @@
 {
     "name": "@airtable/blocks-testing",
-    "version": "0.0.4",
+    "version": "0.0.6",
     "description": "Airtable Blocks Testing Library",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Airtable/blocks-testing.git"
+        "url": "https://github.com/Airtable/blocks.git"
     },
     "homepage": "https://airtable.com/developers/blocks",
     "main": "dist/cjs/index.js",
@@ -14,7 +14,7 @@
         "types"
     ],
     "scripts": {
-        "ci": "(cd ../sdk && yarn build) && yarn run build && yarn run test:coverage && ./scripts/check_integration_with_sdk.sh",
+        "ci": "echo '--- blocks-testing' && (cd ../sdk && yarn build) && yarn run build && yarn run test:coverage && ./scripts/check_integration_with_sdk.sh",
         "pretest": "yarn run lint && yarn run types",
         "version": "changelog-publish --github-repo-url='https://github.com/airtable/blocks-testing' --git-tag-prefix='@airtable/blocks-testing@' && git add CHANGELOG.md",
         "release": "npm_config_registry=https://registry.npmjs.org/ release-it",
@@ -56,7 +56,6 @@
         "babel-plugin-transform-define": "^2.0.0",
         "concurrently": "^5.0.0",
         "eslint": "6.7.2",
-        "eslint-plugin-airtable": "github:hyperbase/eslint-plugin-airtable#01fef1f",
         "eslint-plugin-import": "^2.19.1",
         "eslint-plugin-jsdoc": "^15.12.0",
         "eslint-plugin-react": "^7.17.0",
@@ -88,8 +87,8 @@
         ]
     },
     "peerDependencies": {
-        "react": "^16.8.0",
-        "react-dom": "^16.8.0",
+        "react": "^16.8.0 || ^17.0.0",
+        "react-dom": "^16.8.0 || ^17.0.0",
         "@airtable/blocks": "^1.5.1"
     },
     "jest": {
@@ -114,7 +113,7 @@
         "hooks": {
             "before:init": "../../bin/check-repo-for-release && yarn build && yarn test",
             "after:bump": "yarn build",
-            "after:release": "(cd ../../ && tools/git-mirror/bin/git-mirror sync @airtable/blocks-testing@${version})"
+            "after:release": "../../tools/git-mirror/bin/git-mirror sync @airtable/blocks-testing@${version}"
         },
         "npm": {
             "access": "public"

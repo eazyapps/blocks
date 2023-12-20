@@ -595,7 +595,13 @@ describe('Base', () => {
 
     describe('getMaxRecordsPerTable', () => {
         it('returns the correct limit', () => {
-            expect(base.getMaxRecordsPerTable()).toEqual(50000);
+            expect(base.getMaxRecordsPerTable()).toEqual(100000);
+        });
+    });
+
+    describe('workspaceId', () => {
+        it('returns the correct workspace id', () => {
+            expect(base.workspaceId).toEqual('wspUai0ZmWFWfSBtb');
         });
     });
 });

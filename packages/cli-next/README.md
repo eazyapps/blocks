@@ -1,7 +1,6 @@
 # @airtable/blocks-cli
 
-Command line tool for Airtable Blocks development.<br /> This README is specifically for the v2
-version of the CLI, which is in public beta
+Command line tool for Airtable Blocks development.
 
 <!-- toc -->
 
@@ -16,7 +15,7 @@ version of the CLI, which is in public beta
 
 To install or update the `block` cli, run:
 
-    npm install --global @airtable/blocks-cli@2.0.0-beta.4
+    npm install --global @airtable/blocks-cli
 
 # Usage
 
@@ -27,7 +26,7 @@ $ npm install -g @airtable/blocks-cli
 $ block COMMAND
 running command...
 $ block (-v|--version|version)
-@airtable/blocks-cli/2.0.0-beta.4 darwin-x64 node-v12.20.1
+@airtable/blocks-cli/2.0.3 darwin-arm64 node-v16.17.0
 $ block --help [COMMAND]
 USAGE
   $ block COMMAND
@@ -85,7 +84,7 @@ _See code:
 
 ## `block init BLOCKIDENTIFIER BLOCKDIRPATH`
 
-Initialize an Airtable app project
+Initialize an Airtable extension project
 
 ```
 USAGE
@@ -96,7 +95,7 @@ OPTIONS
   --template=template  [default: https://github.com/Airtable/apps-hello-world]
 
 EXAMPLE
-  $ block init app12345678/blk12345678 hellow-world-app --template https://github.com/Airtable/apps-hello-world
+  $ block init app12345678/blk12345678 hello-world-extension --template https://github.com/Airtable/apps-hello-world
 ```
 
 ## `block list-remotes`
@@ -147,7 +146,7 @@ EXAMPLE
 
 ## `block run`
 
-Run the app locally
+Run the extension locally
 
 ```
 USAGE
@@ -182,7 +181,7 @@ EXAMPLE
 
 ## `block submit`
 
-Submit app for review for listing in the the Airtable Marketplace
+Submit extension for review for listing in the the Airtable Marketplace
 
 ```
 USAGE
@@ -200,16 +199,56 @@ EXAMPLE
 
 # New features in v2
 
+## CSS Support
+
+The new CLI supports css files within your extension by default. The default webpack bundler is
+configured with css-loader and style-loader. This means you can import a css file into your
+extension. Example:
+
+```
+// styles.css
+.red {
+  color: red;
+}
+```
+
+```
+import {initializeBlock} from '@airtable/blocks/ui';
+import React from 'react';
+import './styles.css'
+
+function MyExtension() {
+    return <div className="red">Hello world</div>;
+}
+
+initializeBlock(() => <MyExtension />);
+```
+
 ## Using code from other directories
 
 The new CLI allows this method of code-sharing by allowing “sibling directories” outside the source
 directory to be bundled. Those other directories can include npm imports based on link or file.
 
+[More details and an example can be found here.](https://github.com/Airtable/apps-shared-code)
+
+## Customizing the webpack config
+
+By default, the CLI uses webpack to bundle your code. Out of the box, it supports using plain
+JavaScript or TypeScript and styling via CSS files. If you want to customize the webpack config
+further, you can do so by installing the `@airtable/blocks-webpack-bundler` package. For more
+information about installing this package and customizing the webpack config, see the README for the
+`@airtable/blocks-webpack-bundler` package at
+[packages/webpack-bundler/README.md](https://github.com/Airtable/blocks/tree/master/packages/webpack-bundler/README.md).
+
 ## Using a custom bundler
 
-Custom bundlers allow users to replace the CLI's built-in bundling functionality that turns app
-source code into publishable artifacts. Your custom bundler's output must conform to the Airtable
-platform's expected format, calling convention, and file structure.
+If customizing the webpack config as described above does not solve your use case, it is also
+possible to replace the bundler entirely with a custom implementation. This is will require a
+significant amount of work.
+
+Custom bundlers allow users to replace the CLI's built-in bundling functionality that turns
+extension source code into publishable artifacts. Your custom bundler's output must conform to the
+Airtable platform's expected format, calling convention, and file structure.
 
 Unlike other bundling systems, which allow configurability by composing multiple single-purpose
 plugins (or replacing just part of the bundling pipeline), this CLI exposes a simpler bundler
@@ -240,6 +279,10 @@ A bundler needs to implement the following APIs:
 class Bundler {
     async bundleAsync(options: ReleaseBundleOptions): Promise<void> {
         // implement release build
+    }
+
+    async findDependenciesAsync(options: SubmitFindDependenciesOptions): Promise<{files: Array<string>}> {
+        // used in `block submit`
     }
 
     async startDevServerAsync(options: RunDevServerOptions & RunDevServerMethods): Promise<void> {

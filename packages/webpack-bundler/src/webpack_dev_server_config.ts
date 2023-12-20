@@ -8,7 +8,7 @@ export interface WebpackDevServerOptions {
 export function createWebpackDevServerConfig({port}: WebpackDevServerOptions): Configuration {
     const unspecifiedConfiguration = {
         logLevel: 'silent',
-    } as any;
+    };
     return {
         port,
         injectClient: false,

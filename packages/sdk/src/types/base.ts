@@ -29,7 +29,6 @@ export interface BaseData {
     collaboratorsById: ObjectMap<UserId, CollaboratorData>;
     activeCollaboratorIds: Array<UserId>;
 
-
     currentUserId: UserId | null;
     permissionLevel: PermissionLevel;
     enabledFeatureNames: Array<string>;
@@ -38,6 +37,7 @@ export interface BaseData {
     billingPlanGrouping: string;
     isBlockDevelopmentRestrictionEnabled: boolean;
     maxRowsPerTable?: number;
+    workspaceId: string;
 }
 
 /** @hidden */

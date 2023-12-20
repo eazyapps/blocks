@@ -1,7 +1,7 @@
 import {BaseId} from '../../src/types/base';
 import {TableId, TableData} from '../../src/types/table';
 import {FieldId, FieldType, FieldData} from '../../src/types/field';
-import {ViewId, ViewType} from '../../src/types/view';
+import {ViewData, ViewId, ViewType} from '../../src/types/view';
 import {RecordId} from '../../src/types/record';
 import {CollaboratorData} from '../../src/types/collaborator';
 import {Color} from '../../src/colors';
@@ -14,6 +14,7 @@ const MOCK_BASE_PERMISSION_LEVEL = 'create';
 const MOCK_CURRENT_USER_ID = 'usrGalSamari';
 const MOCK_BASE_COLOR = 'purple';
 const MOCK_BILLING_GROUP = 'pro';
+const MOCK_WORKSPACE_ID = 'wspUai0ZmWFWfSBtb';
 
 export function convertFixtureDataToSdkInitData(fixtureData: FixtureData): SdkInitData {
     const {
@@ -51,8 +52,16 @@ export function convertFixtureDataToSdkInitData(fixtureData: FixtureData): SdkIn
             billingPlanGrouping: MOCK_BILLING_GROUP,
             appInterface: {},
             isBlockDevelopmentRestrictionEnabled: false,
+            workspaceId: MOCK_WORKSPACE_ID,
         },
         intentData: null,
+    };
+}
+
+function convertViewFixtureDataToViewData(viewFixtureData: ViewFixtureData): ViewData {
+    return {
+        ...viewFixtureData,
+        isLockedView: !!viewFixtureData.isLockedView,
     };
 }
 
@@ -66,8 +75,8 @@ function convertTableFixtureDataToTableData(tableFixtureData: TableFixtureData):
         fieldsById: keyBy<FieldData, string>(fields.map(convertFieldFixtureDataToFieldData), getId),
         activeViewId: views[0].id,
         viewOrder: views.map(v => v.id),
-        viewsById: keyBy(views, getId),
-        recordsById: undefined, 
+        viewsById: keyBy(views.map(convertViewFixtureDataToViewData), getId),
+        recordsById: undefined,
         lock: null,
         externalSyncById: null,
     };
@@ -82,6 +91,7 @@ function convertFieldFixtureDataToFieldData(fieldFixtureData: FieldFixtureData):
         description,
         typeOptions: options,
         lock: null,
+        isSynced: false,
     };
 }
 
@@ -111,7 +121,7 @@ export interface FixtureData {
 
 /** A representation of the state of a Table */
 interface TableFixtureData {
-    /** A unique identifier for the simulated Tbale */
+    /** A unique identifier for the simulated Table */
     id: TableId;
     /** The name to assign to the simulated Table */
     name: string;
@@ -169,6 +179,11 @@ interface ViewFixtureData {
      * is distinct from the complete fixture data for the simulated Records.
      */
     records: Array<ViewRecordFixtureData>;
+    /**
+     * Optional boolean denoting if the view is locked. By default tests assume
+     * the view is unlocked if undefined.
+     */
+    isLockedView?: boolean;
 }
 
 /**

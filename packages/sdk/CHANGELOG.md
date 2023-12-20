@@ -9,9 +9,91 @@ Not every commit needs to result in a change to this file (e.g. docs and chore c
 commit that affects the code in a way that consumers might care about should include edits to the
 'Unreleased' section though. Breaking changes should be prefixed with `**BREAKING:**`.
 
-## [Unreleased](https://github.com/airtable/blocks/compare/@airtable/blocks@1.9.0...HEAD)
+## [Unreleased](https://github.com/airtable/blocks/compare/@airtable/blocks@1.18.1...HEAD)
 
 No changes.
+
+## [1.18.1](https://github.com/airtable/blocks/compare/@airtable/blocks@1.18.0...@airtable/blocks@1.18.1) - 2023-11-29
+
+-   Support React 17 as a peer dependency.
+
+## [1.18.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.17.0...@airtable/blocks@1.18.0) - 2023-09-15
+
+-   Add `FieldType.AI_TEXT`.
+
+## [1.17.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.16.0...@airtable/blocks@1.17.0) - 2023-04-14
+
+No changes.
+
+## [1.16.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.15.0...@airtable/blocks@1.16.0) - 2023-03-08
+
+-   Update `FieldType.DATE_TIME` documentation to add additional time zones and clarify the write
+    behavior.
+-   Visually refresh all icons
+
+## [1.15.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.14.0...@airtable/blocks@1.15.0) - 2022-09-23
+
+-   Add `applyRowTemplate` icon
+-   Update `FieldType.DATE_TIME` documentation to pre-announce write behavior for field level time
+    zones
+-   Modify `createRecordsAsync`, `updateRecordsAsync`, `convertStringToCellValue` so that date
+    string inputs to date time fields are interpreted correctly for utc or client time zone, fixing
+    previously incorrect behaviors. In this new version, ambiguous strings like
+    "2020-09-05T07:00:00" and "2020-09-08" will be interpreted according to the `timeZone` of the
+    field, and nonambiguous string inputs with zone offset like "2020-09-05T07:00:00.000Z" and
+    "2020-09-08T00:00:00-07:00" will be interpreted correctly as the underlying timestamp.
+
+## [1.14.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.13.0...@airtable/blocks@1.14.0) - 2022-07-26
+
+-   Add `personalCloseup` icon
+-   Add `xCheckbox` icon
+
+## [1.13.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.12.0...@airtable/blocks@1.13.0) - 2022-06-28
+
+-   Add ability to read (and watch) if a view is locked
+-   Update `FieldType.MULTIPLE_COLLABORATOR` documentation to include user group collaborator
+    information
+
+## [1.12.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.11.1...@airtable/blocks@1.12.0) - 2022-06-22
+
+-   Update fallback value in `Base.getMaxRecordsPerTable`
+-   Add `overlay` icon
+-   Update `cursor.setActiveTable` and `cursor.setActiveView` documentation to describe fullscreen
+    exit behavior correctly
+-   Fix an issue where rapidly subscribing and unsubscribing to a single field could cause a
+    queryResult to be to incorrectly marked as loaded.
+-   Update API reference documentation to reflect 'extensions' in place of 'apps'
+-   Update examples in documentation to reflect 'extensions' in place of 'apps'
+
+## [1.11.1](https://github.com/airtable/blocks/compare/@airtable/blocks@1.11.0...@airtable/blocks@1.11.1) - 2022-04-13
+
+-   Update internal utilities for error reporting
+
+## [1.11.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.10.2...@airtable/blocks@1.11.0) - 2022-03-10
+
+-   Add workspace id to base object.
+-   Add `Field.updateNameAsync`
+-   Fixes a crash when a linked record is deleted
+-   Fixes a crash when a record containing a linked record is deleted and restored
+
+## [1.10.2](https://github.com/airtable/blocks/compare/@airtable/blocks@1.10.1...@airtable/blocks@1.10.2) - 2022-01-25
+
+-   Rare invariant failure addressed
+
+## [1.10.1](https://github.com/airtable/blocks/compare/@airtable/blocks@1.10.0...@airtable/blocks@1.10.1) - 2021-12-22
+
+-   Update examples for table, view and field URLs.
+-   Use `keyof any` instead of `PropertyKey` in type definition to avoid incompatibility with the
+    "[keyofStringsOnly](https://www.typescriptlang.org/tsconfig#keyofStringsOnly)" tsconfig option
+
+## [1.10.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.9.0...@airtable/blocks@1.10.0) - 2021-11-03
+
+-   Fix typo in cursor.ts documentation - thanks @m2creates!
+-   Add new `calendarDay` icon (and micro variant)
+-   Update documentation to include attachment url guidance
+-   Update field metadata writes documentation to mention that `null` will be coerced to `''`
+-   Fix a bug when unloading data from a `linkedRecordQueryResult` after a table deletion
+-   Update `children` prop of `Link` component to be optional
 
 ## [1.9.0](https://github.com/airtable/blocks/compare/@airtable/blocks@1.8.0...@airtable/blocks@1.9.0) - 2021-09-15
 

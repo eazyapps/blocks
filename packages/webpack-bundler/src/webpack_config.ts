@@ -1,6 +1,4 @@
-import {Configuration} from 'webpack';
-
-import {BUNDLE_NAME} from '../settings';
+import * as webpack from 'webpack';
 
 /**
  * Serializable bundler configuration summary.
@@ -41,7 +39,16 @@ export interface JavascriptAssetOptions {
     assetType: 'javascript';
 
     transpiler: 'babel';
-    options: any;
+    options: {[key: string]: unknown};
+}
+
+export interface BaseWebpackConfig extends webpack.Configuration {
+    resolve: {
+        extensions: Array<string>;
+    };
+    module: {
+        rules: Array<webpack.RuleSetRule>;
+    };
 }
 
 /**
@@ -60,7 +67,7 @@ function injectLiveReloadClient(entry: string, liveReload: WebpackSummaryOptions
         };
     }
     return {
-        [BUNDLE_NAME]: entry,
+        bundle: entry,
         ...otherScripts,
     };
 }
@@ -81,7 +88,7 @@ export function createWebpackCompilerConfig({
     assets: {
         javascript: {options: babelOptions},
     },
-}: WebpackSummaryOptions): Configuration {
+}: WebpackSummaryOptions): BaseWebpackConfig {
     let devtool;
 
     if (mode === 'development') {
@@ -104,6 +111,10 @@ export function createWebpackCompilerConfig({
         },
         module: {
             rules: [
+                {
+                    test: /\.css$/,
+                    use: [require.resolve('style-loader'), require.resolve('css-loader')],
+                },
                 {
                     test: /\.(?:m?j|t)sx?$/,
                     include: [/node_modules/],

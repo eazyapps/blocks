@@ -22,7 +22,6 @@ export const APP_ROOT_TEMPORARY_DIR = '.tmp';
 
 export const APP_RELEASE_DIR = 'dist';
 
-export const BUNDLE_NAME = 'bundle';
 export const BUNDLE_FILE_NAME = 'bundle.js';
 
 export const AIRTABLE_API_URL = 'https://api.airtable.com';
@@ -33,10 +32,7 @@ export const GLOBAL_REACT_DOM_SERVER_VARIABLE_NAME = '_airtableReactDOMServer';
 export const GLOBAL_RUN_BLOCK_FUNCTION_NAME = '_airtableRunBlock';
 export const GLOBAL_BLOCK_CODE_VERSION_VARIABLE_NAME = '_airtableBlockCodeVersion';
 
-export const BLOCK_REQUEST_BODY_LIMIT = 5.2 * 1024 * 1024; 
+export const BLOCK_REQUEST_BODY_LIMIT = 5.2 * 1024 * 1024;
 
 /** The name of the blocks sdk. */
 export const SDK_PACKAGE_NAME = '@airtable/blocks';
-
-/** This access token is not considered sensitive. */
-export const ROLLBAR_ACCESS_TOKEN = '2de7b9533b7243f7989e3a7584c7dad7';

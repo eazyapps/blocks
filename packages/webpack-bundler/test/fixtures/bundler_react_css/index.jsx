@@ -1,11 +1,12 @@
 import React from 'react';
+import './index.css';
 
 function ReactApp() {
-    return <div>Hello World</div>;
+    return <div className="red">Hello World</div>;
 }
 
 export function Root() {
     return <ReactApp />;
 }
 
-initialzeApp(Root());
+initializeBlock(Root());

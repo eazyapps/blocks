@@ -15,6 +15,7 @@ const WatchableFieldKeys = Object.freeze({
     options: 'options' as const,
     isComputed: 'isComputed' as const,
     description: 'description' as const,
+    isFieldSynced: 'isFieldSynced' as const,
 });
 
 /**
@@ -240,7 +241,7 @@ class Field extends AbstractModel<FieldData, WatchableFieldKey> {
      *
      * This action is asynchronous. Unlike updates to cell values, updates to field options are
      * **not** applied optimistically locally. You must `await` the returned promise before
-     * relying on the change in your app.
+     * relying on the change in your extension.
      *
      * Optionally, you can pass an `opts` object as the second argument. See {@link UpdateFieldOptionsOpts}
      * for available options.
@@ -277,6 +278,83 @@ class Field extends AbstractModel<FieldData, WatchableFieldKey> {
                 options: options,
             },
             opts,
+        });
+    }
+
+    /**
+     * Checks whether the current user has permission to perform the given name update.
+     *
+     * Accepts partial input, in the same format as {@link updateNameAsync}.
+     *
+     * Returns `{hasPermission: true}` if the current user can update the specified field,
+     * `{hasPermission: false, reasonDisplayString: string}` otherwise. `reasonDisplayString` may be
+     * used to display an error message to the user.
+     *
+     * @param name new name for the field
+     *
+     * @example
+     * ```js
+     * const updateFieldCheckResult = field.checkPermissionsForUpdateName();
+     *
+     * if (!updateFieldCheckResult.hasPermission) {
+     *     alert(updateFieldCheckResult.reasonDisplayString);
+     * }
+     * ```
+     */
+    checkPermissionsForUpdateName(name?: string): PermissionCheckResult {
+        return this._sdk.__mutations.checkPermissionsForMutation({
+            type: MutationTypes.UPDATE_SINGLE_FIELD_NAME,
+            tableId: this.parentTable.id,
+            id: this.id,
+            name,
+        });
+    }
+
+    /**
+     * An alias for `checkPermissionsForUpdateName(options).hasPermission`.
+     *
+     * Checks whether the current user has permission to perform the name update.
+     *
+     * Accepts partial input, in the same format as {@link updateNameAsync}.
+     *
+     * @param name new name for the field
+     *
+     * @example
+     * ```js
+     * const canUpdateField = field.hasPermissionToUpdateName();
+     *
+     * if (!canUpdateField) {
+     *     alert('not allowed!');
+     * }
+     * ```
+     */
+    hasPermissionToUpdateName(name?: string): boolean {
+        return this.checkPermissionsForUpdateName(name).hasPermission;
+    }
+
+    /**
+     * Updates the name for this field.
+     *
+     * Throws an error if the user does not have permission to update the field, or if an invalid
+     * name is provided.
+     *
+     * This action is asynchronous. Unlike updates to cell values, updates to field name are
+     * **not** applied optimistically locally. You must `await` the returned promise before
+     * relying on the change in your extension.
+     *
+     * @param name new name for the field
+     *
+     * @example
+     * ```js
+     * await myTextField.updateNameAsync('My New Name');
+     * ```
+     */
+    async updateNameAsync(name: string): Promise<void> {
+        await this._sdk.__mutations.applyMutationAsync({
+            type: MutationTypes.UPDATE_SINGLE_FIELD_NAME,
+            tableId: this.parentTable.id,
+            id: this.id,
+            name,
         });
     }
 
@@ -334,31 +412,21 @@ class Field extends AbstractModel<FieldData, WatchableFieldKey> {
     /**
      * Updates the description for this field.
      *
-     * To remove an existing description, pass `''` or `null` as the new description.
+     * To remove an existing description, pass `''` as the new description.
+     * `null` is also accepted and will be coerced to `''` for consistency with field creation.
      *
      * Throws an error if the user does not have permission to update the field, or if an invalid
      * description is provided.
      *
      * This action is asynchronous. Unlike updates to cell values, updates to field descriptions are
      * **not** applied optimistically locally. You must `await` the returned promise before
-     * relying on the change in your app.
+     * relying on the change in your extension.
      *
      * @param description new description for the field
      *
      * @example
      * ```js
-     * async function addChoiceToSelectField(selectField, nameForNewOption) {
-     *     const updatedOptions = {
-     *         choices: [
-     *             ...selectField.options.choices,
-     *             {name: nameForNewOption},
-     *         ]
-     *     };
-     *
-     *     if (selectField.hasPermissionToUpdateOptions(updatedOptions)) {
-     *         await selectField.updateOptionsAsync(updatedOptions);
-     *     }
-     * }
+     * await myTextField.updateDescriptionAsync('This is a text field');
      * ```
      */
     async updateDescriptionAsync(description: string | null): Promise<void> {
@@ -368,6 +436,17 @@ class Field extends AbstractModel<FieldData, WatchableFieldKey> {
             id: this.id,
             description,
         });
+    }
+
+    /**
+     * `true` if this field is synced, `false` otherwise. A field is
+     * "synced" if it's source is from another airtable base or external data source
+     * like Google Calendar, Jira, etc..
+     *
+     * @hidden
+     */
+    get isFieldSynced(): boolean {
+        return this._data.isSynced ?? false;
     }
 
     /**
@@ -475,6 +554,7 @@ class Field extends AbstractModel<FieldData, WatchableFieldKey> {
             appInterface,
             string,
             this._data,
+            {parseDateCellValueInColumnTimeZone: this.type === FieldType.DATE_TIME},
         );
 
         if (this.isComputed) {
@@ -513,6 +593,9 @@ class Field extends AbstractModel<FieldData, WatchableFieldKey> {
         }
         if (dirtyPaths.description) {
             this._onChange(WatchableFieldKeys.description);
+        }
+        if (dirtyPaths.isSynced) {
+            this._onChange(WatchableFieldKeys.isFieldSynced);
         }
     }
 }

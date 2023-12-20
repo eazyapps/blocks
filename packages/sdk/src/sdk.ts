@@ -1,6 +1,5 @@
 /** @hidden */ /** */
 
-
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import {ModelChange} from './types/base';
@@ -14,7 +13,7 @@ import Viewport from './viewport';
 import SettingsButton from './settings_button';
 import UndoRedo from './undo_redo';
 import {PerformRecordAction} from './perform_record_action';
-import {AirtableInterface, AppInterface} from './types/airtable_interface';
+import {AirtableInterface, AppInterface, BlockRunContext} from './types/airtable_interface';
 import {RequestJson, ResponseJson} from './types/backend_fetch_types';
 
 if (!(React as any).PropTypes) {
@@ -149,7 +148,6 @@ export default class BlockSdk {
         });
 
         this._registerHandlers();
-
     }
     /** @internal */
     __applyModelChanges(changes: ReadonlyArray<ModelChange>) {
@@ -170,7 +168,6 @@ export default class BlockSdk {
     }
     /** @internal */
     _registerHandlers() {
-
         this.__airtableInterface.subscribeToModelUpdates(({changes}) => {
             this.__applyModelChanges(changes);
         });
@@ -235,5 +232,10 @@ export default class BlockSdk {
     /** @hidden */
     async unstable_fetchAsync(requestJson: RequestJson): Promise<ResponseJson> {
         return await this.__airtableInterface.performBackendFetchAsync(requestJson);
+    }
+
+    /** @hidden */
+    getBlockRunContext(): BlockRunContext {
+        return this.__airtableInterface.sdkInitData.runContext;
     }
 }

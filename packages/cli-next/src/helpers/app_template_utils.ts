@@ -1,4 +1,3 @@
-
 import {Octokit} from '@octokit/rest';
 import tar from 'tar';
 import fetch from 'node-fetch';
@@ -15,7 +14,7 @@ export async function getGithubTemplateTarballUrlAsync(templateUrl: string) {
         const {url} = await octokit.repos.downloadTarballArchive({
             owner,
             repo,
-            ref: 'master',
+            ref: '',
         });
         return url;
     } catch (e) {
