@@ -52,7 +52,7 @@ describe('LinkedRecordQueryResult', () => {
         query = await sdk.base.tables[0].selectRecordsAsync();
         record = query.getRecordById('recA');
 
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
             sdk.cursor.watch('isDataLoaded', function init() {
                 sdk.cursor.unwatch('isDataLoaded', init);
                 resolve();
@@ -528,8 +528,8 @@ describe('LinkedRecordQueryResult', () => {
             await new Promise(resolve => {
                 linked.watch('isDataLoaded', resolve);
 
-                linked.unloadData(); 
-                linked.unloadData(); 
+                linked.unloadData();
+                linked.unloadData();
             });
         });
 

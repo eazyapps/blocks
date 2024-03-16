@@ -1177,9 +1177,9 @@ describe('TableOrViewQueryResult', () => {
 
             describe('unsubscribing from cell values in fields', () => {
                 const whenUnsubscribed = () => {
-                    return new Promise(resolve => {
+                    return new Promise<void>(resolve => {
                         mockAirtableInterface.unsubscribeFromCellValuesInFields.mockImplementation(
-                            resolve,
+                            resolve(),
                         );
                     });
                 };

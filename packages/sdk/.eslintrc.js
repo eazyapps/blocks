@@ -16,15 +16,7 @@ module.exports = {
         project: path.join(__dirname, './tsconfig.json'),
         sourceType: 'module',
     },
-    plugins: [
-        'airtable',
-        '@airtable/blocks',
-        'react',
-        'react-hooks',
-        'import',
-        'jsdoc',
-        '@typescript-eslint',
-    ],
+    plugins: ['@airtable/blocks', 'react', 'react-hooks', 'import', 'jsdoc', '@typescript-eslint'],
     settings: {
         react: {
             version: '16.8',
