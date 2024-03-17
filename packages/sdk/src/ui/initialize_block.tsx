@@ -110,8 +110,8 @@ export function initializeBlock(getEntryElement: DashboardOrEntryPoints) {
 
     const container = document.createElement('div');
     body.appendChild(container);
-    const root = createRoot(container!); // createRoot(container!) if you use TypeScript
-    root.render(<BlockWrapper sdk={sdk}>{entryElement}</BlockWrapper>, container);
+    const root = createRoot(container);
+    root.render(<BlockWrapper sdk={sdk}>{entryElement}</BlockWrapper>);
 }
 
 let sdk: Sdk;
